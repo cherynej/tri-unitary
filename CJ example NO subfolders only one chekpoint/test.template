@@ -1,0 +1,29 @@
+#! /bin/bash
+#SBATCH -t ###CPUT
+#SBATCH --mem=###mem
+#SBATCH --mail-user=cheryne.cluster@gmail.com
+#SBATCH --mail-type=END,FAIL
+#SBATCH -n 1
+#SBATCH -N 1
+#SBATCH -p owners
+
+RUN_NAME=###RN
+SCRATCH_DIR=/home/groups/vkhemani/cheryne/test/runs/$RUN_NAME
+SCRATCH_DIR_BASE=/home/groups/vkhemani/cheryne/test/runs
+
+mkdir -p $SCRATCH_DIR
+
+EXEC1=triunitary_prethermalization_canonicaltyp.py
+EXEC2=SpinLibraryCherynePython3.py
+
+cd $SCRATCH_DIR_BASE
+cp $EXEC1 $SCRATCH_DIR/
+cp $EXEC2 $SCRATCH_DIR/
+
+#mkdir data_folder
+#mkdir checkpoint_folder
+
+cd $SCRATCH_DIR
+
+export OMP_NUM_THREADS=1
+python $EXEC1 ###L ###eps ###W ###num_states ###tmax ###niter ###run_number
