@@ -1,0 +1,14 @@
+#! /bin/bash
+#SBATCH -t 42:00:00
+#SBATCH --mem=12gb
+#SBATCH --mail-user=cheryne.cluster@gmail.com
+#SBATCH --mail-type=END,FAIL
+#SBATCH -n 1
+#SBATCH -N 1
+#SBATCH -p owners
+
+export OMP_NUM_THREADS=1
+params=$3
+
+echo $params
+python test.py $params 
