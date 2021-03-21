@@ -17,8 +17,6 @@ def generate_config():
 	#tmaxvec=[10000] #max time
     niter=10 #total number of iterations
     chunk_size=1 #break them into chunks
-    cput="00:10:00"
-    mem="12"
     
     params=[]
 
@@ -26,13 +24,13 @@ def generate_config():
     num_states=num_statesvec[0]
     tmax=tmaxvec[0]
 
-    header = ["L", "eps", "W", "tmax", "num_states", "niter", "chunk_size", "cput", "mem"]
+    header = ["L", "eps", "W", "tmax", "num_states", "niter", "chunk_size"]
     with open(CONFIG_PATH, 'w') as fp:
         writer = csv.writer(fp, delimiter=',')
         writer.writerow(header)
         for ind_L,L in enumerate(Lvec):
             for ind_e,eps in enumerate(epsvec):
-                writer.writerow([L, eps, Wint, tmax, num_states, niter, chunk_size, cput, mem])
+                writer.writerow([L, eps, Wint, tmax, num_states, niter, chunk_size])
 
 directory = sys.argv[1]
 
@@ -47,20 +45,18 @@ config = pd.read_csv(CONFIG_PATH)
 for index, row in config.iterrows():
     params = {col:row[col] for col in config.columns}
     params['directory'] = directory
-    cput = params["cput"]
-    mem = params["mem"]
-    niter = params["niter"]
-    chunk_size = params["chunk_size"]
+    niter = int(params["niter"])
+    chunk_size = int(params["chunk_size"])
     num_jobs = niter // chunk_size 
     for i in range(num_jobs):
         params['chunk_id'] = i
         params_string = json.dumps(params, separators=(',',':'))
-        command = 'sbatch cheryne.qusub {} {} \'{}\''.format(cput, mem, params_string)
+        command = 'sbatch cheryne.qusub \'{}\''.format(params_string)
         os.system(command)
 
     if niter % chunk_size != 0:
         params['chunk_id'] = num_jobs
         params['chunk_size'] = niter % chunk_size
         params_string = json.dumps(params, separators=(',',':'))
-        command = 'sbatch cheryne.qsub {} {} \'{}\''.format(cput, mem, params_string)
+        command = 'sbatch cheryne.qsub \'{}\''.format(params_string)
         os.system(command)
