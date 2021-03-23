@@ -128,8 +128,9 @@ class Checkpoint:
         with open(self.version_path, 'w') as f:
             f.write(str(version))
 
-    def save(self, state):
-        new_version = 1 - self.get_version()
+    def save(self, state, new_version=None):
+        if not new_version:
+            new_version = 1 - self.get_version()
         for key in State.fields:
             filepath = os.path.join(checkpoint_path, '{}_{}.npy'.format(new_version, key))
             np.save(filepath, state[key])
@@ -296,3 +297,5 @@ for n in range(nmin, chunk_size):
     state['num_statesmin']: np.array([0])
     state['tmin']: np.array([0])
     checkpoint.save(state)
+
+checkpoint.save(state, 'final')
